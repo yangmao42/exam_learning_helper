@@ -1,0 +1,27 @@
+from airtest.core.api import *
+
+# 方式一：直接连接微信小程序窗口的句柄 (推荐)
+# 句柄号可以通过 AirtestIDE 的“Windows窗口连接”功能直接获取
+connect_device("Windows:///你的窗口句柄号")
+
+import time
+
+# --- 配置参数 ---
+START_X, START_Y = 800, 500  # 滑动的起点 (注意：坐标是相对于小程序窗口的)
+END_X, END_Y = 200, 500       # 滑动的终点，从右向左滑以实现“向右翻页”
+PAGE_COUNT = 5                 # 总共需要翻多少页
+
+# --- 主循环 ---
+for i in range(PAGE_COUNT):
+    # 1. 执行滑动翻页
+    swipe((START_X, START_Y), (END_X, END_Y), duration=0.5)
+    
+    # 2. 等待页面稳定 (非常重要！)
+    # 给页面加载和动画留出时间，否则截图可能是模糊或未加载完的
+    sleep(1.5) 
+    
+    # 3. 截图并保存
+    snapshot(filename=f"page_{i+1}.png")
+    print(f"已截图第 {i+1} 页")
+
+print("截图任务完成！")

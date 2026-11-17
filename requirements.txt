@@ -1,0 +1,9 @@
+# 直接依赖（版本为本机实测可用版本）
+# 安装：pip install -r requirements.txt
+airtest==1.4.3
+pywinauto==0.6.3
+mss==6.1.0
+pywin32==312
+numpy==1.26.4
+opencv-contrib-python==4.6.0.66
+pillow==13.0.0
