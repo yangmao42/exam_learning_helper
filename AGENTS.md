@@ -25,6 +25,7 @@ D:\hcip\learning_project\
 - `Airtest/` 是 **editable 安装源**（`pip list` 显示 airtest 1.4.3 指向 `D:\hcip\learning_project\Airtest`），改这里的代码会直接影响所有脚本运行行为；它本质上是上游源码，**不要顺手改**，确需修改前先确认是否该改上游。
 - 工作区根目录是 **git 仓库**（分支 `main`），远端为 `https://github.com/yangmao42/exam_learning_helper.git`；`Airtest/` 是独立的上游 clone，已被 `.gitignore` 排除，不随本仓库上传。
 - `pic/` 下的图片由人工归置，脚本运行产物请按需放入对应子目录，不要散落在根目录。
+- **截图入库策略**：脚本自动产出的批次目录 `pic/handle_*/` 已在 `.gitignore` 中，**新批次默认不入库**；仓库里已存在的历史批次（`run01_175p`、`run02_100p`）保持跟踪，不会被删掉。确实需要上传某个新批次时用 `git add -f pic/handle_<句柄>/runNN_<页数>p` 强制添加。
 
 ## 3. 运行环境
 

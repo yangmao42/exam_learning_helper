@@ -11,6 +11,12 @@ env/
 # --- 上游源码 clone（不入库，改用 requirements.txt 安装 airtest）---
 Airtest/
 
+# --- 截图产物（脚本自动生成的批次目录，默认不入库）---
+# 说明：.gitignore 只影响“未跟踪”的文件，已入库的历史批次（run01_175p、run02_100p 等）
+#       仍保持跟踪，不会被删除或丢失。
+#       如需把某个新批次也上传，用强制添加：git add -f pic/handle_<句柄>/runNN_<页数>p
+pic/handle_*/
+
 # --- 运行产物 / 本地临时文件 ---
 log/
 logs/
