@@ -33,6 +33,7 @@ D:\hcip\learning_project\
 - 关键依赖：`airtest 1.4.3`（本地源码）、`pywinauto 0.6.3`、`mss 6.1.0`、`pywin32 312`、`numpy 1.26.4`、`opencv-contrib-python 4.6.0.66`、`pillow 13.0.0`
 - 运行方式：`& .venv\Scripts\python.exe <脚本名>.py`（在仓库根目录执行）
 - 未安装：`poco`（如需 UI 树定位，需另行安装）
+- **Git 传输后端**：本机 Git 默认的 `schannel` 后端访问 github.com 会被中间设备重置连接（`Recv failure: Connection was reset`），本仓库已单独设置 `http.sslBackend=openssl`（仅仓库级，未改全局配置）；若换机器遇到同样报错，先试 `-c http.sslBackend=openssl`。
 
 ## 4. 目标窗口与连接方式
 
