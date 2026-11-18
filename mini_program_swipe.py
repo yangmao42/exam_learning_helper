@@ -10,11 +10,12 @@ import os
 from airtest.core.api import *
 
 # --- 配置参数 ---
-WINDOW_HANDLE = 987172           # 微信小程序窗口句柄（可用 AirtestIDE 的“Windows窗口连接”获取）
-PAGE_COUNT = 100                 # 总共需要翻多少页
+WINDOW_HANDLE = 1971996          # 微信小程序窗口句柄（可用 AirtestIDE 的“Windows窗口连接”获取）
+PAGE_COUNT = 20                  # 本次翻页次数
+START_PAGE = 412                 # 起始页号（续跑时接上一次，整批从 1 开始）
 SWIPE_DURATION = 0.2             # swipe 持续时间（秒）
 WAIT_SECONDS = 0.5               # 每页等待页面稳定的时间（秒）
-RUN_TAG = "run02_100p"           # 本批次目录名（同一句柄下多批次依次递增）
+RUN_TAG = "run01_411p"           # 本批次目录名（同一句柄下多批次依次递增）
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           "pic", "handle_%d" % WINDOW_HANDLE, RUN_TAG)   # 截图保存目录
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -45,8 +46,8 @@ for i in range(PAGE_COUNT):
     sleep(WAIT_SECONDS)
 
     # 3. 截图并保存
-    filename = os.path.join(OUTPUT_DIR, "page_%d.png" % (i + 1))
+    filename = os.path.join(OUTPUT_DIR, "page_%d.png" % (START_PAGE + i))
     snapshot(filename=filename)
-    print("已截图第 %d 页 -> %s" % (i + 1, filename))
+    print("已截图第 %d 页 -> %s" % (START_PAGE + i, filename))
 
 print("截图任务完成！")
