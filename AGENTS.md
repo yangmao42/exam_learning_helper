@@ -18,6 +18,7 @@ D:\hcip\learning_project\
 │  └─ handle_<句柄>/      # 按窗口句柄分组的抓取批次
 │     ├─ run01_175p/      # 批次目录命名：runNN_<页数>p（同一句柄下多批次依次递增）
 │     └─ run02_100p/
+├─ ocr_kg/                # 错题知识图谱流水线（OCR + nano-NotebookLM），详见 DEPLOY_OCR_KG.md
 ├─ test.txt               # 临时草稿/参考片段（纯文本，非可执行脚本）
 └─ *.py                   # 根目录下的独立自动化脚本，每个脚本自成一体
 ```
@@ -69,3 +70,30 @@ print(np.abs(a - b).mean(), (np.abs(a - b).sum(axis=2) > 12).mean())
 - 中文注释与中文 `print` 输出；配置项（句柄、页数、时长、坐标、输出目录）集中在文件顶部常量区，便于调参。
 - 关键动作后**必须留等待**（Airtest 的 `sleep` 或 `time.sleep`）再截图，否则容易拍到动画中间帧。
 - Windows 平台的“滑动”本质是 pywinauto 的鼠标按住拖拽，`duration` / `steps` 影响手势时长与平滑度；起点终点都要落在窗口内容区内，否则手势不会作用在小程序上。
+
+## 8. 错题知识图谱流水线（ocr_kg/）
+
+- `ocr_kg/` 是**错题知识图谱流水线**：DeepSeek-OCR 2（纯 CPU）把 `pic/` 里的截图转成 Markdown，
+  再喂给 nano-NotebookLM 抽知识点、建可编辑知识图谱。完整手册见 `ocr_kg/DEPLOY_OCR_KG.md`。
+- **虚拟环境独立于项目 `.venv`**：OCR 侧 `ocr_kg/Universal-DeepSeek-OCR-2/.venv`，
+  NLM 侧 `ocr_kg/nano-NotebookLM/.venv`，均由 uv 创建、解释器基座统一为 CPython 3.12.13。
+  项目 `.venv` 锁着 airtest + numpy 1.26.4，**不要往里装 torch/transformers**。
+- 装依赖必须带 CPU 轮子源：`--index-url https://download.pytorch.org/whl/cpu`，
+  否则会拉进 CUDA 依赖。两个 venv 各约 1.1–1.3 GB。
+- **网络镜像（本机必读）**：`github.com` 直连被重置 → clone 走 `https://ghfast.top/https://github.com/...`；
+  `huggingface.co` 超时 → 设 `HF_ENDPOINT=https://hf-mirror.com`；模型权重用
+  `ocr_kg/download_model.py`（分片并行 + 断点续传，6.3GB 实测 4–9MB/s）。
+- **LLM 后端是外部大模型 API，不是本地 Ollama**：配置在 `ocr_kg/nano-NotebookLM/.env`
+  的 `OPENAI_BASE_URL` / `OPENAI_MODEL` / `OPENAI_API_KEY`；`.env` 只是首启引导，
+  服务起来后 `artifacts/providers.json` 才是运行时真源（改供应商用 UI 的 Settings）。
+- `.env` 含 API Key，`ocr_kg/nano-NotebookLM/` 已被 `ocr_kg/.gitignore` 屏蔽，不要入库。
+- NLM 服务启动：`cd ocr_kg\nano-NotebookLM` → `$env:HF_ENDPOINT='https://hf-mirror.com'` →
+  `& .venv\Scripts\python.exe api\server.py`（http://127.0.0.1:8000）。
+- 流水线四步：`batch_ocr.py`（截图→逐页 md）→ `clean_ocr_out.py`（二次清洗，幂等，
+  清洗规则改了跑它而**不用重跑 OCR**）→ `build_md_batches.py`（合成批次 md）
+  → `upload_to_notebooklm.py`（上传并触发建图）。前三步用 OCR 侧/项目 venv，
+  最后一步用 NLM venv 的 python 运行。
+- **清洗分三级**：行级白名单（`UI_NOISE_PATTERNS`）、行内按钮文案
+  （`INLINE_NOISE_TOKENS`，如「全选 提交答案」）、章节级丢弃（`DROP_SECTIONS`）。
+  噪声标签必须**整行锚定匹配**（`^ai\s*深度$`），否则会误删「深度学习」这类题干。
+- OCR 实测：175 页 292 分钟（单页异常 6915s，剔除后均值 61.1s/页）；批量可断点续跑。

@@ -1,0 +1,15 @@
+# ── 第三方上游 clone（不入库）────────────────────────────────
+Universal-DeepSeek-OCR-2/
+nano-NotebookLM/
+
+# ── 本地虚拟环境（根 .gitignore 的 .venv/ 规则其实已覆盖，这里双保险）──
+.venv/
+*/.venv/
+
+# ── 运行产物 ───────────────────────────────────────────────
+ocr_out/
+ocr_batches/
+models/
+_peek/
+bench_out/
+*.json.tmp
